@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
 
 # Allow longer lines for rake files (they often have long system commands)
 Layout/LineLength:

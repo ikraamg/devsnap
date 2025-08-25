@@ -29,9 +29,10 @@ rails devsnap:restore[name]         # Restore snapshot
 
 ## Requirements
 
-- Rails 6.1+
-- PostgreSQL
-- Development environment only
+- **Ruby 3.2+** (actively supported versions)
+- **Rails 7.0+** (actively supported versions) 
+- **PostgreSQL** (any version)
+- **Development environment only**
 
 ## Configuration
 
