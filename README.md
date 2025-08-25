@@ -1,5 +1,7 @@
 # devsnap
 
+[![CI](https://github.com/ikraamg/devsnap/actions/workflows/ci.yml/badge.svg)](https://github.com/ikraamg/devsnap/actions/workflows/ci.yml)
+
 Zero-friction DB snapshots for Rails development. Auto-captures before migrations, so you can undo anything.
 
 ## Install (30 seconds)

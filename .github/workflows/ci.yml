@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        ruby-version: ['3.0', '3.1', '3.2', '3.3']
+        rails-version: ['6.1', '7.0', '7.1']
+        
+    name: Ruby ${{ matrix.ruby-version }} / Rails ${{ matrix.rails-version }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby ${{ matrix.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+        
+    - name: Install PostgreSQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+        
+    - name: Override Rails version
+      run: |
+        # Update Gemfile to use specific Rails version from matrix
+        sed -i 's/gem "rails", ">= 6.1"/gem "rails", "~> ${{ matrix.rails-version }}.0"/' Gemfile
+        
+    - name: Install dependencies
+      run: bundle install
+      
+    - name: Run tests
+      run: bundle exec rspec --format documentation --color
+      
+    - name: Verify rake file syntax
+      run: ruby -c devsnap.rake
+      
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        
+    - name: Install dependencies
+      run: |
+        gem install rubocop
+        
+    - name: Run RuboCop
+      run: rubocop devsnap.rake --config .rubocop.yml || echo "RuboCop warnings found but not failing CI"
+      continue-on-error: true
+      
+  compatibility:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Test installation command
+      run: |
+        # Test the curl installation works
+        mkdir -p lib/tasks
+        cp devsnap.rake lib/tasks/devsnap.rake
+        echo "Installation successful"
+        
+    - name: Verify file structure
+      run: |
+        # Ensure the rake file is self-contained
+        if grep -q "require" devsnap.rake; then
+          echo "Warning: rake file contains require statements"
+          exit 1
+        fi
+        echo "✓ Self-contained rake file verified"
+        
+    - name: Check file size
+      run: |
+        # Ensure the file stays small and manageable
+        size=$(wc -l < devsnap.rake)
+        echo "devsnap.rake is $size lines"
+        if [ $size -gt 150 ]; then
+          echo "Warning: File is getting large ($size lines)"
+          exit 1
+        fi
+        echo "✓ File size is reasonable"

@@ -1,0 +1,31 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+
+# Allow longer lines for rake files (they often have long system commands)
+Layout/LineLength:
+  Max: 120
+
+# Allow compact method definitions in rake files  
+Style/SingleLineMethods:
+  Enabled: false
+
+# Allow long blocks (rake tasks are often long)
+Metrics/BlockLength:
+  Enabled: false
+
+# Allow multiple assignments 
+Style/ParallelAssignment:
+  Enabled: false
+
+# Don't require top-level documentation for rake files
+Style/Documentation:
+  Enabled: false
+
+# Allow multiple statements per line in simple cases
+Style/Semicolon:
+  Enabled: false
+
+# Allow system() calls without checking return value in some contexts
+Lint/UnusedMethodArgument:
+  Enabled: false
